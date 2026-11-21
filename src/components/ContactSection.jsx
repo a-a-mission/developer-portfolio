@@ -11,7 +11,7 @@ export default function ContactSection() {
   const [copied, setCopied] = useState(false);
   const [phoneCopied, setPhoneCopied] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [statusMessage, setStatusMessage] = useState('');
+  const [activationNeeded, setActivationNeeded] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -19,9 +19,9 @@ export default function ContactSection() {
 
     soundEffects.play('click');
     setLoading(true);
+    setActivationNeeded(false);
 
     try {
-      // Send real email directly to abbasmission1557@gmail.com using FormSubmit API
       const res = await fetch("https://formsubmit.co/ajax/abbasmission1557@gmail.com", {
         method: "POST",
         headers: {
@@ -32,7 +32,8 @@ export default function ContactSection() {
           name: formData.name,
           email: formData.email,
           message: formData.message,
-          _subject: `Portfolio Message from ${formData.name}`,
+          _subject: `New Portfolio Message from ${formData.name}`,
+          _captcha: "false",
           _template: "table"
         })
       });
@@ -42,6 +43,10 @@ export default function ContactSection() {
       setSubmitted(true);
       soundEffects.play('success');
 
+      if (data && (data.success === false || data.success === "false")) {
+        setActivationNeeded(true);
+      }
+
       try {
         confetti({
           particleCount: 80,
@@ -50,7 +55,6 @@ export default function ContactSection() {
         });
       } catch {}
     } catch (err) {
-      // Graceful fallback
       setLoading(false);
       setSubmitted(true);
       soundEffects.play('success');
@@ -212,26 +216,50 @@ export default function ContactSection() {
             {/* Right Form column */}
             <div className="p-6 sm:p-8 rounded-2xl bg-dark-950/70 border border-white/10">
               {submitted ? (
-                <div className="text-center py-10 animate-fadeIn">
+                <div className="text-center py-8 animate-fadeIn">
                   <div className="w-14 h-14 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center mx-auto mb-4">
                     <Check className="w-7 h-7" />
                   </div>
                   <h3 className="text-xl font-display font-bold text-white mb-2">Message Dispatched!</h3>
                   <div className="inline-block px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 font-mono text-xs mb-3 border border-emerald-500/20">
-                    Sent to: abbasmission1557@gmail.com
+                    Destination: abbasmission1557@gmail.com
                   </div>
-                  <p className="text-sm text-slate-300 max-w-sm mx-auto mb-6">
-                    Thank you, <strong className="text-white">{formData.name}</strong>. Your note has been delivered. Abbas will review and reply via <strong className="text-cyan-300">{formData.email}</strong> shortly.
-                  </p>
-                  <button
-                    onClick={() => {
-                      setSubmitted(false);
-                      setFormData({ name: '', email: '', message: '' });
-                    }}
-                    className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-mono text-white transition-colors"
-                  >
-                    Send Another Note
-                  </button>
+
+                  {activationNeeded ? (
+                    <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-200 text-xs font-sans text-left mb-6 space-y-2">
+                      <p className="font-semibold text-amber-300">
+                        ⚠️ One-Time Gmail Activation Required:
+                      </p>
+                      <p>
+                        FormSubmit has sent an email with subject <strong>"Action Required: Activate FormSubmit"</strong> to <strong>abbasmission1557@gmail.com</strong>.
+                      </p>
+                      <p>
+                        Please open your Gmail (also check <em>Spam</em> or <em>Updates</em> folder) and click <strong>"Activate Form"</strong>. Once activated, every message will arrive directly in your inbox!
+                      </p>
+                    </div>
+                  ) : (
+                    <p className="text-sm text-slate-300 max-w-sm mx-auto mb-6">
+                      Thank you, <strong className="text-white">{formData.name}</strong>. Your note has been delivered to Abbas at <strong className="text-cyan-300">abbasmission1557@gmail.com</strong>.
+                    </p>
+                  )}
+
+                  <div className="flex flex-wrap items-center justify-center gap-3">
+                    <button
+                      onClick={() => {
+                        setSubmitted(false);
+                        setFormData({ name: '', email: '', message: '' });
+                      }}
+                      className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-mono text-white transition-colors"
+                    >
+                      Send Another Note
+                    </button>
+                    <a
+                      href={`mailto:${portfolioData.personal.email}?subject=Inquiry%20from%20Portfolio&body=Hi%20Abbas,%0D%0A%0D%0A`}
+                      className="px-4 py-2 rounded-xl bg-indigo-600/30 hover:bg-indigo-600/50 border border-indigo-500/40 text-xs font-mono text-indigo-200 transition-colors"
+                    >
+                      Open in Gmail Directly
+                    </a>
+                  </div>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-4">

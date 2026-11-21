@@ -15,7 +15,7 @@ export const portfolioData = {
     phone: "+880 1766-811996",
     rawPhone: "01766811996",
     whatsapp: "https://wa.me/8801766811996",
-    github: "https://github.com/mission1556",
+    github: "https://github.com/a-a-mission",
     linkedin: "https://www.linkedin.com/in/mission1556/",
     twitter: "https://x.com/Mission1557",
     discord: "mission#1557",

@@ -142,7 +142,7 @@ export default function CommandPalette({ isOpen, onClose, onOpenTerminal, onTogg
     },
     {
       id: 'github',
-      title: 'Open GitHub Profile (mission1556)',
+      title: 'Open GitHub Profile (a-a-mission)',
       category: 'Social',
       icon: FolderGit2,
       action: () => {
